@@ -1,20 +1,53 @@
 import { SchemasKey } from "../models/mod.ts";
 
-export interface Doit {
+// const actsSample = {
+//   user: {
+//     create: {
+//       validator: (input: any) => {
+//         return true;
+//       },
+//       fn: (input: any) => {
+//         return input;
+//       }
+//     },
+//     update: {
+//       validator: (input: any) => {
+//         return true;
+//       },
+//       fn: (input: any) => {
+//         return input;
+//       }
+//     }
+//   }
+// }
+
+export interface Act {
   validator: Function;
   fn: Function;
 }
 
-export const doits: Record<SchemasKey, Record<string, Doit>> = {};
+export const acts: Record<SchemasKey, Record<string, Act>> = {};
 
-export interface DoitInp {
+export interface ActInp {
   schema: SchemasKey;
-  doitName: string;
+  actName: string;
   validator: Function;
   fn: Function;
 }
 
-export const addDoit: (doitInp: DoitInp) => void = (doitInp) => {
-  const { schema, doitName, validator, fn } = doitInp;
-  doits[schema][doitName] = { validator, fn };
+export const setAct: (doitInp: ActInp) => void = (
+  { schema, actName, validator, fn },
+) => {
+  acts[schema][actName] = { validator, fn };
+};
+
+export const getAct: (
+  schema: SchemasKey,
+  actName: string,
+) => Act | undefined = (schema, actName) => {
+  return acts[schema][actName];
+};
+
+export const getActs: (schema: SchemasKey) => Act[] = (schema) => {
+  return Object.values(acts[schema]);
 };
