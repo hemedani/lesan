@@ -1,4 +1,4 @@
-import { SchemasKey } from "./mod.ts";
+import { SchemasKey } from "../models/mod.ts";
 
 export interface Doit {
   validator: Function;
