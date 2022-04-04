@@ -1,4 +1,5 @@
 import { getSchema } from "./schema.ts";
+import { OutRelation } from "./types.ts";
 
 const schemas = getSchema();
 
@@ -13,8 +14,28 @@ export const addOneOutRelation = (
     };
   },
 ) => {
-  schemas[schemaName].outrelation = {
-    ...schemas[schemaName].outrelation,
+  const schema = schemas[schemaName];
+  if (!schema) {
+    throw new Error(`Schema ${schemaName} does not exist`);
+  }
+  schema.outrelation = {
+    ...schema.outrelation,
     [outrelationName]: { schemaName, number, sort },
   };
 };
+
+export const addOutRelations = (
+  { schemaName, outrelation }: {
+    schemaName: string;
+    outrelation: Record<string, OutRelation>;
+  },
+) => {
+  const schema = schemas[schemaName];
+  if (!schema) {
+    throw new Error(`Schema ${schemaName} does not exist`);
+  }
+  schema.outrelation = outrelation;
+};
+
+export const getOutRelations = (schemaName: string) =>
+  schemas[schemaName].outrelation;
