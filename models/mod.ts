@@ -1,159 +1,6 @@
-import { AnyStruct } from "../lestruct/src/utils.ts";
-
-interface PureModel {
-  [key: string]: AnyStruct;
-}
-
-export type Relations = Record<string, PureModel>;
-
-export interface Model {
-  pure: PureModel;
-  inrelation: Relations;
-  outrelation: Relations;
-}
+import { InRelation, Model, OutRelation, PureModel } from "./types.ts";
 
 const schemas: Record<string, Model> = {};
-
-// const schemasSample = {
-//   "user": {
-//     pure: {
-//       "id": string(),
-//       "name": string(),
-//       "age": number(),
-//     },
-//     inrelation: {
-//       "posts": { schemaName: "post", type: "many" },
-//     },
-//     outrelation: {
-//       "comments": {
-//         schemaName: "comment",
-//         number: 50,
-//         sort: { filed: "id", order: "desc" },
-//       },
-//     },
-//     embedded: {
-//       "posts": array({
-//         "id": string(),
-//         "title": string(),
-//         "content": string(),
-//       }),
-//       "comments": array({
-//         "id": string(),
-//         "content": string(),
-//       }),
-//     },
-//     sttuct: assign(
-//       object({
-//         "id": string(),
-//         "name": string(),
-//         "age": number(),
-//       }),
-//       object({
-//         "posts": array({
-//           "id": string(),
-//           "title": string(),
-//           "content": string(),
-//         }),
-//         "comments": array({
-//           "id": string(),
-//           "content": string(),
-//         }),
-//       }),
-//     ),
-//   },
-//   "post": {
-//     pure: {
-//       "id": string(),
-//       "title": string(),
-//       "content": string(),
-//     },
-//     inrelation: {
-//       "user": { schemaName: "user", type: "one" },
-//     },
-//     outrelation: {
-//       "comments": {
-//         schemaName: "comment",
-//         number: 50,
-//         sort: { filed: "id", order: "desc" },
-//       },
-//     },
-//     embedded: {
-//       "user": object({
-//         "id": string(),
-//         "name": string(),
-//         "age": number(),
-//       }),
-//       "comments": array({
-//         "id": string(),
-//         "content": string(),
-//       }),
-//     },
-//     sttuct: assign(
-//       object({
-//         "id": string(),
-//         "title": string(),
-//         "content": string(),
-//       }),
-//       object({
-//         "user": object({
-//           "id": string(),
-//           "name": string(),
-//           "age": number(),
-//         }),
-//         "comments": array({
-//           "id": string(),
-//           "content": string(),
-//         }),
-//       }),
-//     ),
-//   },
-//   "comment": {
-//     pure: {
-//       "id": string(),
-//       "content": string(),
-//     },
-//     inrelation: {
-//       "user": { schemaName: "user", type: "one" },
-//     },
-//     outrelation: {
-//       "post": {
-//         schemaName: "post",
-//         number: 50,
-//         sort: { filed: "id", order: "desc" },
-//       },
-//     },
-//     embedded: {
-//       "user": object({
-//         "id": string(),
-//         "name": string(),
-//         "age": number(),
-//       }),
-//       "post": object({
-//         "id": string(),
-//         "title": string(),
-//         "content": string(),
-//       }),
-//     },
-//     sttuct: assign(
-//       object({
-//         "id": string(),
-//         "content": string(),
-//       }),
-//       object({
-//         "user": object({
-//           "id": string(),
-//           "name": string(),
-//           "age": number(),
-//         }),
-//         "post": object({
-//           "id": string(),
-//           "title": string(),
-//           "content": string(),
-//         }),
-//       }),
-//     ),
-//   },
-// };
 
 export type SchemasKey = keyof typeof schemas;
 
@@ -161,12 +8,34 @@ export const addPureModel = (name: string, pureModel: PureModel) => {
   schemas[name].pure = pureModel;
 };
 
-export const addRelation = (
-  name: SchemasKey,
-  relationType: "inrelation" | "outrelation",
-  relation: Relations,
+export const addInRelation = (
+  { schemaName, inrelationName, type }: {
+    schemaName: string;
+    inrelationName: string;
+    type: "one" | "many";
+  },
 ) => {
-  schemas[name][relationType] = relation;
+  schemas[schemaName].inrelation = {
+    ...schemas[schemaName].inrelation,
+    [inrelationName]: { schemaName, type },
+  };
+};
+
+export const addOutRelation = (
+  { schemaName, outrelationName, number, sort }: {
+    schemaName: string;
+    outrelationName: string;
+    number: number;
+    sort: {
+      field: string;
+      order: "asc" | "desc";
+    };
+  },
+) => {
+  schemas[schemaName].outrelation = {
+    ...schemas[schemaName].outrelation,
+    [outrelationName]: { schemaName, number, sort },
+  };
 };
 
 export const getPureModel = (name: SchemasKey) => schemas[name].pure;
@@ -206,13 +75,4 @@ export const getAllModelByName = () => schemas;
 export const getPureModelByNameAndKey = (name: string, key: string) => {
   const pureModel = schemas[name].pure[key];
   return pureModel;
-};
-
-export const getRelationByNameAndKey = (
-  name: string,
-  relationType: "inrelation" | "outrelation",
-  key: string,
-) => {
-  const relation = schemas[name][relationType][key];
-  return relation;
 };

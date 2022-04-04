@@ -1,0 +1,23 @@
+import { AnyStruct } from "../lestruct/src/utils.ts";
+import { SchemasKey } from "./mod.ts";
+
+export interface PureModel {
+  [key: string]: AnyStruct;
+}
+
+export interface InRelation {
+  schemaName: SchemasKey;
+  type: "one" | "many";
+}
+
+export interface OutRelation {
+  schemaName: SchemasKey;
+  number: number;
+  sort: { field: string; order: "asc" | "desc" };
+}
+
+export interface Model {
+  pure: PureModel;
+  inrelation: Record<string, InRelation>;
+  outrelation: Record<string, OutRelation>;
+}
