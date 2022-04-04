@@ -1,7 +1,7 @@
-import { getSchema } from "./schema.ts";
+import { getSchemas } from "./schema.ts";
 import { InRelation } from "./types.ts";
 
-const schemas = getSchema();
+const schemas = getSchemas();
 
 export const addInrelations = (
   { schemaName, inrelation }: {

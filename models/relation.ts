@@ -1,6 +1,6 @@
-import { getSchema, SchemasKey } from "./schema.ts";
+import { getSchemas, SchemasKey } from "./schema.ts";
 
-const schemas = getSchema();
+const schemas = getSchemas();
 
 export const getRelation = (
   name: SchemasKey,

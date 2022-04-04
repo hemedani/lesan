@@ -1,7 +1,7 @@
-import { getSchema, SchemasKey } from "./schema.ts";
+import { getSchemas, SchemasKey } from "./schema.ts";
 import { PureModel } from "./types.ts";
 
-const schemas = getSchema();
+const schemas = getSchemas();
 
 export const addPureModel = (name: string, pureModel: PureModel) => {
   schemas[name].pure = pureModel;
