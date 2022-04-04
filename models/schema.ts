@@ -56,8 +56,6 @@ export const getPureFromOutRel = (schemaName: SchemasKey) => {
 };
 
 export const createEmbedded = (schemaName: SchemasKey) => {
-  const schema = getSchema(schemaName);
-
   return {
     ...getPureFromInRel(schemaName),
     ...getPureFromOutRel(schemaName),
