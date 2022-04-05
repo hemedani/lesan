@@ -1,3 +1,4 @@
+import { Struct } from "https://deno.land/x/lestruct/mod.ts";
 import { SchemasKey } from "../models/mod.ts";
 
 // const actsSample = {
@@ -44,7 +45,7 @@ import { SchemasKey } from "../models/mod.ts";
 // };
 
 export interface Act {
-  validator: Function;
+  validator: Struct;
   fn: Function;
 }
 
@@ -70,7 +71,7 @@ export interface ActInp {
   type: "static" | "dynamic";
   schema: SchemasKey;
   actName: string;
-  validator: Function;
+  validator: Struct;
   fn: Function;
 }
 
@@ -93,13 +94,17 @@ export const getDynamicActs = () => acts.dynamic;
 
 export const getStaticActs = () => acts.static;
 
+export const getStaticKeys = () => Object.keys(acts.static);
+
+export const getDynamicKeys = () => Object.keys(acts.dynamic);
+
 export const getSchemaDynamicActs: (
   schema: SchemasKey,
 ) => { [key: string]: Act } = (
   schema,
 ) => {
   if (!acts.dynamic[schema]) {
-    return {};
+    throw new Error(`Invalid schema: ${schema}`);
   }
   return acts.dynamic[schema];
 };
@@ -137,4 +142,47 @@ export const getStaticAct: (
     throw new Error(`Invalid actName: ${actName}`);
   }
   return acts.static[schema][actName];
+};
+
+export const getActs = (type: "static" | "dynamic", schema: string) => {
+  if (!acts[type]) {
+    throw new Error(
+      `Invalid action type: ${type} it just include dynamic and static`,
+    );
+  }
+  if (!acts[type][schema]) {
+    throw new Error(`Invalid schema: ${schema}`);
+  }
+  return acts[type][schema];
+};
+
+export const getActsKeys = (type: "static" | "dynamic", schema: string) => {
+  if (!acts[type]) {
+    throw new Error(
+      `Invalid action type: ${type} it just include dynamic and static`,
+    );
+  }
+  if (!acts[type][schema]) {
+    throw new Error(`Invalid schema: ${schema}`);
+  }
+  return Object.keys(acts[type][schema]);
+};
+
+export const getAct = (
+  type: "static" | "dynamic",
+  schema: string,
+  actName: string,
+) => {
+  if (!acts[type]) {
+    throw new Error(
+      `Invalid action type: ${type} it just include dynamic and static`,
+    );
+  }
+  if (!acts[type][schema]) {
+    throw new Error(`Invalid schema: ${schema}`);
+  }
+  if (!acts[type][schema][actName]) {
+    throw new Error(`Invalid action name: ${actName}`);
+  }
+  return acts[type][schema][actName];
 };
