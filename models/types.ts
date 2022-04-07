@@ -1,8 +1,8 @@
-import { AnyStruct } from "https://deno.land/x/lestruct/mod.ts";
+import { Struct } from "https://deno.land/x/lestruct/mod.ts";
 import { SchemasKey } from "./mod.ts";
 
 export interface PureModel {
-  [key: string]: AnyStruct;
+  [key: string]: Struct<any>;
 }
 
 export interface InRelation {
