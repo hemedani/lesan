@@ -12,7 +12,6 @@ export interface Body {
     act: string;
   };
   details: Details;
-  context: Record<string, any>;
 }
 
 const decodeBody = async (req: Request): Promise<Body> => {
