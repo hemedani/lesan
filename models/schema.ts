@@ -33,8 +33,8 @@ export const getPureFromInRel = (schemaName: SchemasKey) => {
     pureSchemas = {
       ...pureSchemas,
       [property]: schema.inrelation[property].type === "one"
-        ? object(schemas[schema.inrelation[property].schemaName].pure)
-        : array(object(schemas[schema.inrelation[property].schemaName].pure)),
+        ? object(schemas[schema.inrelation[property].schemaName]?.pure)
+        : array(object(schemas[schema.inrelation[property].schemaName]?.pure)),
     };
   }
   return pureSchemas;
@@ -48,7 +48,7 @@ export const getPureFromOutRel = (schemaName: SchemasKey) => {
     pureSchemas = {
       ...pureSchemas,
       [property]: array(
-        object(schemas[schema.outrelation[property].schemaName].pure),
+        object(schemas[schema.outrelation[property].schemaName]?.pure),
       ),
     };
   }
