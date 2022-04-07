@@ -1,5 +1,6 @@
 import { Struct } from "https://deno.land/x/lestruct/mod.ts";
 import { SchemasKey } from "../models/mod.ts";
+import { Body } from "../utils/mod.ts";
 
 // const actsSample = {
 //   dynamic: {
@@ -44,9 +45,11 @@ import { SchemasKey } from "../models/mod.ts";
 //   },
 // };
 
+export type ActFn = (body: Body) => any;
+
 export interface Act {
-  validator: Struct;
-  fn: Function;
+  validator: Struct<any>;
+  fn: ActFn;
 }
 
 export interface Acts {
@@ -71,8 +74,8 @@ export interface ActInp {
   type: "static" | "dynamic";
   schema: SchemasKey;
   actName: string;
-  validator: Struct;
-  fn: Function;
+  validator: Struct<any>;
+  fn: ActFn;
 }
 
 export const setAct: (actInp: ActInp) => void = (
