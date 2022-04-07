@@ -4,7 +4,12 @@ import { PureModel } from "./types.ts";
 const schemas = getSchemas();
 
 export const addPureModel = (name: string, pureModel: PureModel) => {
-  schemas[name].pure = pureModel;
+  schemas[name] = {
+    pure: pureModel,
+    inrelation: {},
+    outrelation: {},
+  };
+  // schemas[name].pure = pureModel;
 };
 
 export const getPureModel = (name: SchemasKey) => schemas[name].pure;
