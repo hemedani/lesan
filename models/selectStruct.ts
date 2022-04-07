@@ -1,5 +1,5 @@
-import { enums, object } from "https://deno.land/x/lestruct@v0.0.1/mod.ts";
-import { optional } from "https://deno.land/x/lestruct@v0.0.1/mod.ts";
+import { enums, object, optional } from "https://deno.land/x/lestruct/mod.ts";
+import { ObjectSchema } from "https://deno.land/x/lestruct@v0.0.1/src/utils.ts";
 import { getPureModel, getSchema, SchemasKey } from "./mod.ts";
 
 export type Iterate = Record<string, number | any>;
@@ -59,14 +59,15 @@ export const selectStruct = <T>(
         ),
       };
     }
-    return returnObj;
+
+    return optional(object(returnObj as ObjectSchema));
   };
 
-  const numberDepth = (depth: number, pureObj: typeof returnObj) => {
+  const numberDepth = (depth: number, pureObj: Record<string, any>) => {
     depth--;
     return depth > -1
       ? iterateRelation(schema, depth, pureObj)
-      : object(pureObj);
+      : optional(object(pureObj));
   };
 
   const objectDepth = (depth: any, pureObj: Record<string, any>) => {
@@ -75,26 +76,26 @@ export const selectStruct = <T>(
     const foundedSchema = getSchema(schema);
     for (const property in foundedSchema.inrelation) {
       checkRelation(depth, property) &&
-        (pureObj = object({
+        (pureObj = {
           ...pureObj,
           [property]: selectStruct(
             foundedSchema.inrelation[property].schemaName,
             depth[property],
           ),
-        }));
+        });
     }
     for (const property in foundedSchema.outrelation) {
       checkRelation(depth, property) &&
-        (pureObj = object({
+        (pureObj = {
           ...pureObj,
           [property]: selectStruct(
             foundedSchema.outrelation[property].schemaName,
             depth[property],
           ),
-        }));
+        });
     }
 
-    return pureObj;
+    return optional(object(pureObj));
   };
 
   const completeObj = typeof depth === "number"
