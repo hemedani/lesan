@@ -8,7 +8,7 @@ export interface Context {
 }
 export let context: Context = {};
 
-export const getContextModel = () => context;
+export const getContext = () => context;
 
 export const addContexts = (con:Context) => {
   context=con
@@ -16,11 +16,5 @@ export const addContexts = (con:Context) => {
 
 export const addContext =(con:Context)=>{
   context={...context,con}
-}
-export const createContextObj = () => object(context);
-
-export const setContext = (data:any) =>{
-  const contextObj = createContextObj();
-  return create(data,contextObj)
 }
 
