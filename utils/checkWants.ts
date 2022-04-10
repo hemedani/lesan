@@ -1,3 +1,4 @@
+import { ServiceKeys } from "../mod.ts";
 import { throwError } from "./mod.ts";
 
 export interface Details {
@@ -6,6 +7,7 @@ export interface Details {
 }
 
 export interface Body {
+  service?: ServiceKeys;
   contents: "dynamic" | "static";
   wants: {
     model: string;
@@ -76,9 +78,9 @@ const decodeBody = async (req: Request): Promise<Body> => {
     : throwError("content type is not correct");
 };
 
-export const parsBody = async (req: Request) => {
+export const parsBody = async (req: Request, port: number) => {
   const parsedBody = await decodeBody(req);
-  const url = req.url.split("8080")[1];
+  const url = req.url.split(`${port}`)[1];
 
   return req.method === "POST" && url === "/lesan"
     ? parsedBody

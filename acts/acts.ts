@@ -3,6 +3,7 @@ import { SchemasKey } from "../models/mod.ts";
 import { Body } from "../utils/mod.ts";
 
 // const actsSample = {
+//
 //   dynamic: {
 //     user: {
 //       create: {
@@ -65,9 +66,16 @@ export interface Acts {
   };
 }
 
-export const acts: Acts = {
-  dynamic: {},
-  static: {},
+export interface Services {
+  main: Acts;
+  [key: string]: Acts | string | undefined;
+}
+
+const acts: Services = {
+  main: {
+    dynamic: {},
+    static: {},
+  },
 };
 
 export interface ActInp {
@@ -81,111 +89,164 @@ export interface ActInp {
 export const setAct: (actInp: ActInp) => void = (
   { type, schema, actName, validator, fn },
 ) => {
-  if (!acts[type]) {
+  if (!acts.main[type]) {
     throw new Error(`Invalid type: ${type}`);
   }
-  if (!acts[type][schema]) {
-    acts[type][schema] = {};
+  if (!acts.main[type][schema]) {
+    acts.main[type][schema] = {};
   }
-  acts[type][schema][actName] = {
+  acts.main[type][schema][actName] = {
     validator,
     fn,
   };
 };
+export type ServiceKeys = keyof typeof acts;
 
-export const getDynamicActs = () => acts.dynamic;
+export const getDynamicActs = (serviceName?: ServiceKeys) => {
+  return (serviceName && acts[serviceName] &&
+      (typeof acts[serviceName] !== "string"))
+    ? (acts[serviceName] as Acts).dynamic
+    : acts.main.dynamic;
+};
 
-export const getStaticActs = () => acts.static;
+export const getStaticActs = (serviceName?: ServiceKeys) => {
+  return (serviceName && acts[serviceName] &&
+      (typeof acts[serviceName] !== "string"))
+    ? (acts[serviceName] as Acts).static
+    : acts.main.static;
+};
 
-export const getStaticKeys = () => Object.keys(acts.static);
+export const getStaticKeys = (serviceName?: ServiceKeys) => {
+  return (serviceName && acts[serviceName] &&
+      (typeof acts[serviceName] !== "string"))
+    ? Object.keys((acts[serviceName] as Acts).static)
+    : Object.keys(acts.main.static);
+};
 
-export const getDynamicKeys = () => Object.keys(acts.dynamic);
+// TODO : check if acts[serviceName] === "string" should throw an error
+export const getDynamicKeys = (serviceName?: ServiceKeys) => {
+  return (serviceName && acts[serviceName] &&
+      (typeof acts[serviceName] !== "string"))
+    ? Object.keys((acts[serviceName] as Acts).dynamic)
+    : Object.keys(acts.main.dynamic);
+};
+
+export const getServiceKeys = () => Object.keys(acts);
 
 export const getSchemaDynamicActs: (
   schema: SchemasKey,
 ) => { [key: string]: Act } = (
   schema,
 ) => {
-  if (!acts.dynamic[schema]) {
+  if (!acts.main.dynamic[schema]) {
     throw new Error(`Invalid schema: ${schema}`);
   }
-  return acts.dynamic[schema];
+  return acts.main.dynamic[schema];
 };
 
 export const getSchemaStaticActs: (schema: string) => { [key: string]: Act } = (
   schema,
 ) => {
-  if (!acts.static[schema]) {
+  if (!acts.main.static[schema]) {
     throw new Error(`Invalid schema: ${schema}`);
   }
-  return acts.static[schema];
+  return acts.main.static[schema];
 };
 
 export const getDynamicAct: (
   schema: SchemasKey,
   actName: string,
 ) => Act = (schema, actName) => {
-  if (!acts.dynamic[schema]) {
+  if (!acts.main.dynamic[schema]) {
     throw new Error(`Invalid schema: ${schema}`);
   }
-  if (!acts.dynamic[schema][actName]) {
+  if (!acts.main.dynamic[schema][actName]) {
     throw new Error(`Invalid actName: ${actName}`);
   }
-  return acts.dynamic[schema][actName];
+  return acts.main.dynamic[schema][actName];
 };
 
 export const getStaticAct: (
   schema: string,
   actName: string,
 ) => Act = (schema, actName) => {
-  if (!acts.static[schema]) {
+  if (!acts.main.static[schema]) {
     throw new Error(`Invalid actName: ${actName}`);
   }
-  if (!acts.static[schema][actName]) {
+  if (!acts.main.static[schema][actName]) {
     throw new Error(`Invalid actName: ${actName}`);
   }
-  return acts.static[schema][actName];
+  return acts.main.static[schema][actName];
 };
 
 export const getActs = (type: "static" | "dynamic", schema: string) => {
-  if (!acts[type]) {
+  if (!acts.main[type]) {
     throw new Error(
       `Invalid action type: ${type} it just include dynamic and static`,
     );
   }
-  if (!acts[type][schema]) {
+  if (!acts.main[type][schema]) {
     throw new Error(`Invalid schema: ${schema}`);
   }
-  return acts[type][schema];
+  return acts.main[type][schema];
 };
 
-export const getActsKeys = (type: "static" | "dynamic", schema: string) => {
-  if (!acts[type]) {
+export const getActsKeys = (
+  service: ServiceKeys,
+  type: "static" | "dynamic",
+  schema: string,
+) => {
+  if (!acts[service] && typeof acts[service] === "string") {
+    throw new Error(
+      `Invalid service name: ${service} `,
+    );
+  }
+  if (!(acts[service] as Acts)[type]) {
     throw new Error(
       `Invalid action type: ${type} it just include dynamic and static`,
     );
   }
-  if (!acts[type][schema]) {
+  if (!(acts[service] as Acts)[type][schema]) {
     throw new Error(`Invalid schema: ${schema}`);
   }
-  return Object.keys(acts[type][schema]);
+  return Object.keys((acts[service] as Acts)[type][schema]);
 };
 
 export const getAct = (
+  service: ServiceKeys,
   type: "static" | "dynamic",
   schema: string,
   actName: string,
 ) => {
-  if (!acts[type]) {
+  if (!acts[service] && typeof acts[service] === "string") {
+    throw new Error(
+      `Invalid service name: ${service} `,
+    );
+  }
+  if (!(acts[service] as Acts)[type]) {
     throw new Error(
       `Invalid action type: ${type} it just include dynamic and static`,
     );
   }
-  if (!acts[type][schema]) {
+  if (!(acts[service] as Acts)[type][schema]) {
     throw new Error(`Invalid schema: ${schema}`);
   }
-  if (!acts[type][schema][actName]) {
+  if (!(acts[service] as Acts)[type][schema][actName]) {
     throw new Error(`Invalid action name: ${actName}`);
   }
-  return acts[type][schema][actName];
+  return (acts[service] as Acts)[type][schema][actName];
+};
+
+export const getAtcsWithServices = () => acts;
+
+export const setService: (serviceName: string, service: Acts | string) => void =
+  (serviceName, service) => {
+    acts[serviceName] = service;
+  };
+
+export const getService: (serviceName: ServiceKeys) => void = (serviceName) => {
+  if (!acts[serviceName]) {
+    throw new Error(`Invalid serviceName: ${serviceName}`);
+  }
+  return acts[serviceName];
 };
