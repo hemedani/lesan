@@ -1,5 +1,5 @@
 import { enums, object, optional } from "https://deno.land/x/lestruct/mod.ts";
-import { ObjectSchema } from "https://deno.land/x/lestruct@v0.0.1/src/utils.ts";
+import { ObjectSchema } from "https://deno.land/x/lestruct@v0.0.2/src/utils.ts";
 import { getPureModel, getSchema, SchemasKey } from "./mod.ts";
 
 export type Iterate = Record<string, number | any>;
