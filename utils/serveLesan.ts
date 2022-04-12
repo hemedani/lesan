@@ -48,9 +48,31 @@ const checkContetType = (body: Body) => {
   return checkModels(body);
 };
 
+async function postData(url = "", body: Body, headers = {}) {
+  // Default options are marked with *
+  const response = await fetch(url, {
+    method: "POST", // *GET, POST, PUT, DELETE, etc.
+    mode: "cors", // no-cors, *cors, same-origin
+    cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+    credentials: "same-origin", // include, *same-origin, omit
+    headers: {
+      "Content-Type": "application/json",
+      ...headers,
+    },
+    redirect: "follow", // manual, *follow, error
+    referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+    body: JSON.stringify(body), // body data type must match "Content-Type" header
+  });
+  return response.json(); // parses JSON response into native JavaScript objects
+}
+
 // TODO: do not implement fetch completly it shoud be fetch data with the same req but change the req.body.service to main
-const fetchService = async (req: Request, serviceValue: string) => {
-  const result = await fetch(serviceValue);
+const fetchService = async (headers: {}, body: Body, serviceValue: string) => {
+  const result = await postData(
+    serviceValue,
+    { ...body, service: "main" },
+    headers,
+  );
   return result;
 };
 
@@ -62,7 +84,7 @@ const checkServices = async (req: Request, port: number) => {
   assert(bodyService, servic);
   const serviceValue = getService(bodyService);
   return typeof serviceValue === "string"
-    ? fetchService(req, serviceValue)
+    ? fetchService(req.headers, body, serviceValue)
     : checkContetType(body);
 };
 
